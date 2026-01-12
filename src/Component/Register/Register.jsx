@@ -1,5 +1,7 @@
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { auth } from "../../firebase/firebase.init";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -9,8 +11,13 @@ const Register = () => {
     const form = e.target;
     const email = form.email.value;
     const password = form.password.value;
-    
+
     console.log(email, password);
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((error) => console.log(error));
   };
 
   return (
