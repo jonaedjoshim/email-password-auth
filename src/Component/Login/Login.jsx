@@ -1,11 +1,16 @@
-import { signInWithEmailAndPassword } from "firebase/auth";
-import React, { useState } from "react";
+import {
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import React, { useRef, useState } from "react";
 import { auth } from "../../firebase/firebase.init";
 import { Link } from "react-router";
 
 const Login = () => {
   const [success, setSuccess] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const emailRef = useRef();
+
   const handleLogIn = (e) => {
     e.preventDefault();
     const form = e.target;
@@ -17,10 +22,27 @@ const Login = () => {
     signInWithEmailAndPassword(auth, email, password)
       .then((result) => {
         console.log(result.user);
-        setSuccess(true);
+        if (!result.user.emailVerified) {
+          alert("Verify your email address first.");
+        } else {
+          setSuccess(true);
+        }
       })
       .catch((error) => {
         console.log(error);
+        setErrorMessage(error.message);
+      });
+  };
+
+  const handleForgetPassword = () => {
+    console.log(emailRef.current.value);
+    const email = emailRef.current.value;
+    // send password reset email
+    sendPasswordResetEmail(auth, email)
+      .then(() => {
+        alert("Password reset email has been sent to your email.");
+      })
+      .catch((error) => {
         setErrorMessage(error.message);
       });
   };
@@ -42,8 +64,9 @@ const Login = () => {
               <input
                 name="email"
                 type="email"
-                className="input"
                 placeholder="Email"
+                ref={emailRef}
+                className="input"
               />
               <label className="label">Password</label>
               <input
@@ -53,7 +76,9 @@ const Login = () => {
                 placeholder="Password"
               />
               <div>
-                <a className="link link-hover">Forgot password?</a>
+                <a onClick={handleForgetPassword} className="link link-hover">
+                  Forgot password?
+                </a>
               </div>
               <button className="btn btn-natural mt-4">Login</button>
             </form>

@@ -1,4 +1,7 @@
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+} from "firebase/auth";
 import React, { useState } from "react";
 import { auth } from "../../firebase/firebase.init";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -34,7 +37,10 @@ const SignUp = () => {
     createUserWithEmailAndPassword(auth, email, password)
       .then((result) => {
         console.log(result);
-        setSuccess(true);
+        // email verify
+        sendEmailVerification(auth.currentUser).then(() => {
+          setSuccess(true);
+        });
       })
       .catch((error) => {
         console.log(error);
@@ -82,7 +88,11 @@ const SignUp = () => {
             <button className="btn btn-naturel">Sign Up</button>
           </form>
           <p>
-            Already have an account? <Link to="/login" className="underline text-blue-500">Login</Link> from here
+            Already have an account?{" "}
+            <Link to="/login" className="underline text-blue-500">
+              Login
+            </Link>{" "}
+            from here
           </p>
           {errorMessage && <p className="text-red-500">{errorMessage}</p>}
           {success && (
