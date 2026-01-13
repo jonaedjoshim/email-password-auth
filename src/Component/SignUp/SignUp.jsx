@@ -1,6 +1,7 @@
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
+  updateProfile,
 } from "firebase/auth";
 import React, { useState } from "react";
 import { auth } from "../../firebase/firebase.init";
@@ -14,10 +15,12 @@ const SignUp = () => {
   const handleSignUp = (e) => {
     e.preventDefault();
     const form = e.target;
+    const name = form.name.value;
+    const photoUrl = form.photo.value;
     const email = form.email.value;
     const password = form.password.value;
     const terms = form.terms.checked;
-    console.log(email, password, terms);
+    console.log(name, photoUrl, email, password, terms);
     setSuccess(false);
     setErrorMessage("");
     if (!terms) {
@@ -40,7 +43,22 @@ const SignUp = () => {
         // email verify
         sendEmailVerification(auth.currentUser).then(() => {
           setSuccess(true);
+          alert("a verification email has been sent. check you email.");
         });
+
+        // update user profile
+        const profile = {
+          displayName: name,
+          photoUrl: photoUrl,
+        };
+
+        updateProfile(auth.currentUser, profile)
+          .then(() => {
+            console.log("user profile has been updated");
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       })
       .catch((error) => {
         console.log(error);
@@ -54,6 +72,20 @@ const SignUp = () => {
         <h1 className="text-3xl font-bold mx-auto">Sign Up now!</h1>
         <div className="card-body">
           <form onSubmit={handleSignUp} className="fieldset">
+            <label className="label">Name</label>
+            <input
+              type="text"
+              name="name"
+              className="input"
+              placeholder="Name"
+            />
+            <label className="label">Photo URL</label>
+            <input
+              type="text"
+              name="photo"
+              className="input"
+              placeholder="Photo URL"
+            />
             <label className="label">Email</label>
             <input
               type="email"
